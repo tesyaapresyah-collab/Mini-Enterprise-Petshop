@@ -51,4 +51,15 @@ public class HewanRepository {
         System.err.println("Error saat menghapus data hewan: " + e.getMessage());
     }
 }
+public void update(Hewan h) {
+    String sql = "UPDATE hewan SET nama_hewan = ?, jenis_hewan = ?, id_pelanggan = ? WHERE id_hewan = ?";
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, h.getNamaHewan());
+        stmt.setString(2, h.getJenisHewan());
+        stmt.setInt(3, h.getIdPelanggan());
+        stmt.setInt(4, h.getIdHewan());
+        stmt.executeUpdate();
+    } catch (SQLException e) { e.printStackTrace(); }
+}
 }

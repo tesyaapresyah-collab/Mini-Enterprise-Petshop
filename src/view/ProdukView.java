@@ -14,73 +14,69 @@ public class ProdukView extends JFrame {
     private JTextField txtNama, txtHarga, txtStok;
 
     public ProdukView() {
-        setTitle("Manajemen Data Produk");
-        setSize(600, 450);
+        setTitle("Manajemen Produk");
+        setSize(600, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
 
-        // --- PANEL INPUT ---
-        JPanel inputPanel = new JPanel(new GridLayout(4, 2, 5, 5));
-        inputPanel.setBorder(BorderFactory.createTitledBorder("Input Produk"));
-        
-        txtNama = new JTextField();
-        txtHarga = new JTextField();
-        txtStok = new JTextField();
-        
-        JButton btnTambah = new JButton("Tambah Produk");
-        JButton btnHapus = new JButton("Hapus Produk");
-        btnHapus.setBackground(Color.RED);
-        btnHapus.setForeground(Color.WHITE);
+        // Panel Input
+        JPanel inputPanel = new JPanel(new GridLayout(5, 2, 5, 5));
+        txtNama = new JTextField(); txtHarga = new JTextField(); txtStok = new JTextField();
+        JButton btnTambah = new JButton("Tambah");
+        JButton btnUpdate = new JButton("Update");
+        JButton btnHapus = new JButton("Hapus");
 
-        inputPanel.add(new JLabel("Nama Produk:")); inputPanel.add(txtNama);
+        inputPanel.add(new JLabel("Nama:")); inputPanel.add(txtNama);
         inputPanel.add(new JLabel("Harga:")); inputPanel.add(txtHarga);
         inputPanel.add(new JLabel("Stok:")); inputPanel.add(txtStok);
-        inputPanel.add(btnTambah); inputPanel.add(btnHapus);
+        inputPanel.add(btnTambah); inputPanel.add(btnUpdate);
+        inputPanel.add(btnHapus);
 
-        // --- PANEL TABEL ---
-        String[] columns = {"ID", "Nama Produk", "Harga", "Stok"};
-        tableModel = new DefaultTableModel(columns, 0);
+        // Tabel
+        tableModel = new DefaultTableModel(new String[]{"ID", "Nama", "Harga", "Stok"}, 0);
         table = new JTable(tableModel);
         
+        // --- LOGIKA MOUSE KLIK ---
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                int row = table.getSelectedRow();
+                txtNama.setText(tableModel.getValueAt(row, 1).toString());
+                txtHarga.setText(tableModel.getValueAt(row, 2).toString());
+                txtStok.setText(tableModel.getValueAt(row, 3).toString());
+            }
+        });
+
         // --- LOGIKA TAMBAH ---
         btnTambah.addActionListener(e -> {
-            try {
-                String nama = txtNama.getText();
-                int harga = Integer.parseInt(txtHarga.getText());
-                int stok = Integer.parseInt(txtStok.getText());
-                
-                repo.add(new Produk(0, nama, harga, stok));
-                
-                txtNama.setText(""); txtHarga.setText(""); txtStok.setText("");
-                loadData();
-                JOptionPane.showMessageDialog(this, "Produk berhasil ditambah!");
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Harga dan Stok harus angka!");
-            }
+            repo.add(new Produk(0, txtNama.getText(), Integer.parseInt(txtHarga.getText()), Integer.parseInt(txtStok.getText())));
+            loadData();
+            clearFields();
+        });
+
+        // --- LOGIKA UPDATE ---
+        btnUpdate.addActionListener(e -> {
+            int row = table.getSelectedRow();
+            if (row == -1) { JOptionPane.showMessageDialog(this, "Pilih data di tabel!"); return; }
+            int id = (int) tableModel.getValueAt(row, 0);
+            repo.update(new Produk(id, txtNama.getText(), Integer.parseInt(txtHarga.getText()), Integer.parseInt(txtStok.getText())));
+            loadData();
+            clearFields();
         });
 
         // --- LOGIKA HAPUS ---
         btnHapus.addActionListener(e -> {
-            int selectedRow = table.getSelectedRow();
-            if (selectedRow == -1) {
-                JOptionPane.showMessageDialog(this, "Pilih baris yang ingin dihapus!");
-                return;
-            }
-            
-            int id = (int) tableModel.getValueAt(selectedRow, 0);
-            int confirm = JOptionPane.showConfirmDialog(this, "Yakin hapus produk ini?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
-            
-            if (confirm == JOptionPane.YES_OPTION) {
-                repo.delete(id);
-                loadData();
-                JOptionPane.showMessageDialog(this, "Produk berhasil dihapus!");
-            }
+            int row = table.getSelectedRow();
+            if (row == -1) { JOptionPane.showMessageDialog(this, "Pilih data di tabel!"); return; }
+            int id = (int) tableModel.getValueAt(row, 0);
+            repo.delete(id);
+            loadData();
+            clearFields();
         });
 
         add(inputPanel, BorderLayout.NORTH);
         add(new JScrollPane(table), BorderLayout.CENTER);
-
+        
         loadData();
     }
 
@@ -88,9 +84,11 @@ public class ProdukView extends JFrame {
         tableModel.setRowCount(0);
         List<Produk> list = repo.getAll();
         for (Produk p : list) {
-            tableModel.addRow(new Object[]{
-                p.getIdProduk(), p.getNamaProduk(), p.getHarga(), p.getStok()
-            });
+            tableModel.addRow(new Object[]{p.getIdProduk(), p.getNamaProduk(), p.getHarga(), p.getStok()});
         }
+    }
+    
+    private void clearFields() {
+        txtNama.setText(""); txtHarga.setText(""); txtStok.setText("");
     }
 }

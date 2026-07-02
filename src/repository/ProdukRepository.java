@@ -42,4 +42,16 @@ public class ProdukRepository {
         e.printStackTrace();
     }
 }
+public void update(Produk p) {
+    String sql = "UPDATE produk SET nama_produk = ?, harga = ?, stok = ? WHERE id_produk = ?";
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, p.getNamaProduk());
+        stmt.setInt(2, p.getHarga());
+        stmt.setInt(3, p.getStok());
+        stmt.setInt(4, p.getIdProduk());
+        stmt.executeUpdate();
+    } catch (SQLException e) { e.printStackTrace(); }
+}
+
 }

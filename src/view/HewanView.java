@@ -12,23 +12,20 @@ import java.util.List;
 public class HewanView extends JFrame {
     private JTable table;
     private DefaultTableModel tableModel;
-    private HewanRepository hewanRepo;
-    private PelangganRepository pelangganRepo;
+    private HewanRepository hewanRepo = new HewanRepository();
+    private PelangganRepository pelangganRepo = new PelangganRepository();
     
     private JTextField txtNamaHewan, txtJenis;
     private JComboBox<Pelanggan> cbPelanggan;
 
     public HewanView() {
-        hewanRepo = new HewanRepository();
-        pelangganRepo = new PelangganRepository();
-        
         setTitle("Manajemen Data Hewan");
         setSize(650, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
 
-        // --- PANEL INPUT ---
+        // Panel Input
         JPanel inputPanel = new JPanel(new GridLayout(5, 2, 5, 5));
         inputPanel.setBorder(BorderFactory.createTitledBorder("Input Hewan"));
         
@@ -37,76 +34,79 @@ public class HewanView extends JFrame {
         cbPelanggan = new JComboBox<>();
         loadPelangganToCombo();
 
-        JButton btnTambah = new JButton("Tambah Hewan");
-        JButton btnHapus = new JButton("Hapus Hewan");
+        JButton btnTambah = new JButton("Tambah");
+        JButton btnUpdate = new JButton("Update");
+        JButton btnHapus = new JButton("Hapus");
         btnHapus.setBackground(Color.RED);
         btnHapus.setForeground(Color.WHITE);
 
         inputPanel.add(new JLabel("Nama Hewan:")); inputPanel.add(txtNamaHewan);
         inputPanel.add(new JLabel("Jenis:")); inputPanel.add(txtJenis);
         inputPanel.add(new JLabel("Pemilik:")); inputPanel.add(cbPelanggan);
-        inputPanel.add(btnTambah); inputPanel.add(btnHapus);
+        inputPanel.add(btnTambah); inputPanel.add(btnUpdate);
+        inputPanel.add(btnHapus);
 
-        // --- PANEL TABEL ---
+        // Tabel
         String[] columns = {"ID", "Nama Hewan", "Jenis", "Pemilik"};
         tableModel = new DefaultTableModel(columns, 0);
         table = new JTable(tableModel);
         
-        // --- LOGIKA TAMBAH ---
-        btnTambah.addActionListener(e -> {
-            if (cbPelanggan.getSelectedItem() == null) {
-                JOptionPane.showMessageDialog(this, "Pilih pemilik!");
-                return;
+        // Mouse Listener untuk pilih data
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                int row = table.getSelectedRow();
+                txtNamaHewan.setText(tableModel.getValueAt(row, 1).toString());
+                txtJenis.setText(tableModel.getValueAt(row, 2).toString());
             }
-            Pelanggan p = (Pelanggan) cbPelanggan.getSelectedItem();
-            Hewan h = new Hewan(0, txtNamaHewan.getText(), txtJenis.getText(), p.getIdPelanggan());
-            hewanRepo.add(h);
-            
-            txtNamaHewan.setText(""); 
-            txtJenis.setText("");
-            loadData();
-            JOptionPane.showMessageDialog(this, "Data berhasil ditambah!");
         });
 
-        // --- LOGIKA HAPUS ---
+        // Logika Tambah
+        btnTambah.addActionListener(e -> {
+            Pelanggan p = (Pelanggan) cbPelanggan.getSelectedItem();
+            hewanRepo.add(new Hewan(0, txtNamaHewan.getText(), txtJenis.getText(), p.getIdPelanggan()));
+            loadData();
+            clearFields();
+        });
+
+        // Logika Update
+        btnUpdate.addActionListener(e -> {
+            int row = table.getSelectedRow();
+            if (row == -1) return;
+            int id = (int) tableModel.getValueAt(row, 0);
+            Pelanggan p = (Pelanggan) cbPelanggan.getSelectedItem();
+            hewanRepo.update(new Hewan(id, txtNamaHewan.getText(), txtJenis.getText(), p.getIdPelanggan()));
+            loadData();
+            clearFields();
+        });
+
+        // Logika Hapus
         btnHapus.addActionListener(e -> {
-            int selectedRow = table.getSelectedRow();
-            if (selectedRow == -1) {
-                JOptionPane.showMessageDialog(this, "Pilih baris yang ingin dihapus!");
-                return;
-            }
-            int id = (int) tableModel.getValueAt(selectedRow, 0);
-            int confirm = JOptionPane.showConfirmDialog(this, "Yakin hapus data ini?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
-            
-            if (confirm == JOptionPane.YES_OPTION) {
-                hewanRepo.delete(id);
-                loadData();
-            }
+            int row = table.getSelectedRow();
+            if (row == -1) return;
+            hewanRepo.delete((int) tableModel.getValueAt(row, 0));
+            loadData();
+            clearFields();
         });
 
         add(inputPanel, BorderLayout.NORTH);
         add(new JScrollPane(table), BorderLayout.CENTER);
-
         loadData();
     }
 
     private void loadPelangganToCombo() {
-        List<Pelanggan> list = pelangganRepo.getAll();
-        for (Pelanggan p : list) {
+        for (Pelanggan p : pelangganRepo.getAll()) {
             cbPelanggan.addItem(p);
         }
     }
 
     private void loadData() {
         tableModel.setRowCount(0);
-        List<Hewan> list = hewanRepo.getAllWithPelanggan();
-        for (Hewan h : list) {
-            tableModel.addRow(new Object[]{
-                h.getIdHewan(), 
-                h.getNamaHewan(), 
-                h.getJenisHewan(), 
-                h.getNamaPemilik()
-            });
+        for (Hewan h : hewanRepo.getAllWithPelanggan()) {
+            tableModel.addRow(new Object[]{h.getIdHewan(), h.getNamaHewan(), h.getJenisHewan(), h.getNamaPemilik()});
         }
+    }
+
+    private void clearFields() {
+        txtNamaHewan.setText(""); txtJenis.setText("");
     }
 }

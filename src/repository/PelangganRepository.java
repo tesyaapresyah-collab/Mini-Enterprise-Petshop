@@ -54,4 +54,15 @@ public class PelangganRepository {
         stmt.executeUpdate();
     } catch (SQLException e) { e.printStackTrace(); }
 }
+public void update(Pelanggan p) {
+    String sql = "UPDATE pelanggan SET nama_pelanggan = ?, no_telp = ?, alamat = ? WHERE id_pelanggan = ?";
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, p.getNamaPelanggan());
+        stmt.setString(2, p.getNoTelp());
+        stmt.setString(3, p.getAlamat());
+        stmt.setInt(4, p.getIdPelanggan());
+        stmt.executeUpdate();
+    } catch (SQLException e) { e.printStackTrace(); }
+}
 }
