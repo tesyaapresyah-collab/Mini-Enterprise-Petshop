@@ -15,40 +15,25 @@ public class PelangganView extends JFrame {
     public PelangganView() {
         repository = new PelangganRepository();
         
-        setTitle("Manajemen Pelanggan");
-        setSize(600, 400);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setTitle("Data Pelanggan");
+        setSize(600, 300);
         setLocationRelativeTo(null);
-        setLayout(new BorderLayout());
-
-        // 1. Setup Tabel
-        String[] columns = {"ID", "Nama Pelanggan", "No Telp", "Alamat"};
+        
+        // Setup Tabel
+        String[] columns = {"ID", "Nama", "No Telp", "Alamat"};
         tableModel = new DefaultTableModel(columns, 0);
         table = new JTable(tableModel);
         
-        // 2. ScrollPane agar tabel bisa di-scroll
         add(new JScrollPane(table), BorderLayout.CENTER);
-
-        // 3. Tombol Refresh
-        JButton btnRefresh = new JButton("Refresh Data");
-        btnRefresh.addActionListener(e -> loadData());
-        add(btnRefresh, BorderLayout.SOUTH);
-
-        // Load data pertama kali
+        
+        // Muat data dari database
         loadData();
     }
 
     private void loadData() {
-        tableModel.setRowCount(0); // Kosongkan tabel sebelum diisi ulang
         List<Pelanggan> list = repository.getAll();
-        
         for (Pelanggan p : list) {
-            Object[] row = {
-                p.getIdPelanggan(), 
-                p.getNamaPelanggan(), 
-                p.getNoTelp(), 
-                p.getAlamat()
-            };
+            Object[] row = {p.getIdPelanggan(), p.getNamaPelanggan(), p.getNoTelp(), p.getAlamat()};
             tableModel.addRow(row);
         }
     }

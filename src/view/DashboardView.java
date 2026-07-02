@@ -15,10 +15,10 @@ public class DashboardView extends JFrame {
         lblWelcome.setFont(new Font("Arial", Font.BOLD, 18));
         add(lblWelcome);
 
-        JButton btnPelanggan = new JButton("CRUD Pelanggan");
-        // Aksi tombol akan kita arahkan ke form Pelanggan nanti
-        btnPelanggan.addActionListener(e -> {
-    new PelangganView().setVisible(true);
-});
-    }
+        // Di dalam konstruktor DashboardView
+JButton btnPelanggan = new JButton("CRUD Pelanggan");
+btnPelanggan.addActionListener(e -> new PelangganView().setVisible(true));
+add(btnPelanggan); 
+
 }
+    }
