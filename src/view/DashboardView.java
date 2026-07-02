@@ -17,8 +17,8 @@ public class DashboardView extends JFrame {
 
         JButton btnPelanggan = new JButton("CRUD Pelanggan");
         // Aksi tombol akan kita arahkan ke form Pelanggan nanti
-        btnPelanggan.addActionListener(e -> JOptionPane.showMessageDialog(this, "Fitur CRUD Pelanggan akan segera dibuat!"));
-        
-        add(btnPelanggan);
+        btnPelanggan.addActionListener(e -> {
+    new PelangganView().setVisible(true);
+});
     }
 }
