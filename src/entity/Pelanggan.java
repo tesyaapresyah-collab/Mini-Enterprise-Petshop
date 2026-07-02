@@ -12,37 +12,16 @@ public class Pelanggan {
         this.noTelp = noTelp;
         this.alamat = alamat;
     }
-    // Getter dan Setter
 
-    public int getIdPelanggan() {
-        return idPelanggan;
-    }
+    // Getter
+    public int getIdPelanggan() { return idPelanggan; }
+    public String getNamaPelanggan() { return namaPelanggan; }
+    public String getNoTelp() { return noTelp; }
+    public String getAlamat() { return alamat; }
 
-    public void setIdPelanggan(int idPelanggan) {
-        this.idPelanggan = idPelanggan;
-    }
-
-    public String getNamaPelanggan() {
-        return namaPelanggan;
-    }
-
-    public void setNamaPelanggan(String namaPelanggan) {
-        this.namaPelanggan = namaPelanggan;
-    }
-
-    public String getNoTelp() {
-        return noTelp;
-    }
-
-    public void setNoTelp(String noTelp) {
-        this.noTelp = noTelp;
-    }
-
-    public String getAlamat() {
-        return alamat;
-    }
-
-    public void setAlamat(String alamat) {
-        this.alamat = alamat;
+    // Method toString untuk JComboBox
+    @Override
+    public String toString() {
+        return this.namaPelanggan;
     }
 }
